@@ -7,7 +7,7 @@ const planController=require("../controller/plan.Controller")
 const subscriptionController=require("../controller/subscription.Controller")
 const exerciseController=require("../controller/exercise.controller")
 const workoutController=require("../controller/workout.controller");
-const { gym } = require("../config/db");
+const progressController=require("../controller/progress.controller")   
 
 router.post("/",authMiddleware,gymController.createGym);
 router.post("/:gymId/join",authMiddleware,gymController.joinGym);
@@ -17,5 +17,10 @@ router.post("/exercise/:gymId",authMiddleware,gymMiddleware,roleMiddleware("OWNE
 router.post("/:gymId/workout",authMiddleware,gymMiddleware,roleMiddleware("OWNER","TRAINER","MEMBER"),workoutController.createWorkout)
 router.get("/:gymId/workourts",authMiddleware,gymMiddleware,roleMiddleware("OWNER","TRAINER","MEMBER"),workoutController.getWorkouts)
 
+router.post("/:gymId/progress",authMiddleware,gymMiddleware,roleMiddleware("OWNER","TRAINER","MEMBER"),progressController.addProgress)
+
+router.get("/:gymId/getProgress",authMiddleware,gymMiddleware,roleMiddleware("OWNER","TRAINER","MEMBER"),progressController.getProgress);
+
+router.get("/:gymId/weightTrend",authMiddleware,gymMiddleware,roleMiddleware("OWNER","TRAINER","MEMBER"),progressController.getWeightTrend);
 
 module.exports=router
