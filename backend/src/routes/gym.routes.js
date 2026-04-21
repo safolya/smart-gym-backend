@@ -7,7 +7,8 @@ const planController=require("../controller/plan.Controller")
 const subscriptionController=require("../controller/subscription.Controller")
 const exerciseController=require("../controller/exercise.controller")
 const workoutController=require("../controller/workout.controller");
-const progressController=require("../controller/progress.controller")   
+const progressController=require("../controller/progress.controller")
+const aiController=require("../controller/ai.controller")  
 
 router.post("/",authMiddleware,gymController.createGym);
 router.post("/:gymId/join",authMiddleware,gymController.joinGym);
@@ -22,5 +23,7 @@ router.post("/:gymId/progress",authMiddleware,gymMiddleware,roleMiddleware("OWNE
 router.get("/:gymId/getProgress",authMiddleware,gymMiddleware,roleMiddleware("OWNER","TRAINER","MEMBER"),progressController.getProgress);
 
 router.get("/:gymId/weightTrend",authMiddleware,gymMiddleware,roleMiddleware("OWNER","TRAINER","MEMBER"),progressController.getWeightTrend);
+
+router.get("/:gymId/insights",authMiddleware,gymMiddleware,roleMiddleware("OWNER","TRAINER","MEMBER"),aiController.getInsights);
 
 module.exports=router
