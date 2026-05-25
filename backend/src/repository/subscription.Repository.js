@@ -1,18 +1,19 @@
-const prisma=require("../config/db")
+const prisma = require("../config/db")
+const notificationQueue = require("../queues/notification.queue");
 
 
-exports.findPlan=(planId)=>{
-    return prisma.plan.findUnique({where:{id:planId}})
+exports.findPlan = (planId) => {
+  return prisma.plan.findUnique({ where: { id: planId } })
 }
 
-exports.findActive=async(userId,gymId)=>{
-    return prisma.subscription.findFirst({
-        where:{
-            userId,
-            gymId,
-            status:"ACTIVE"
-        }
-    })
+exports.findActive = async (userId, gymId) => {
+  return prisma.subscription.findFirst({
+    where: {
+      userId,
+      gymId,
+      status: "ACTIVE"
+    }
+  })
 }
 
 exports.findMembership = (userId, gymId) => {
@@ -31,6 +32,22 @@ exports.createMembership = (userId, gymId) => {
   });
 };
 
-exports.createSubscription=(data)=>{
-    return prisma.subscription.create({data});
+exports.createSubscription =async (data) => {
+  const subscription = prisma.subscription.create({ data });
+
+  const delayMs = data.endDate.getTime() - Date.now();
+
+  await notificationQueue.add(
+    "subscription-expiry-reminder",
+    {
+      userId,
+      gymId,
+      subscriptionId: subscription.id,
+    },
+    {
+      delay: delayMs,
+    }
+  );
+
+  return subscription;
 }

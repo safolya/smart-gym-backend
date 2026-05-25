@@ -1,9 +1,10 @@
 const prisma=require("../config/db")
+const redis=require("../config/redis")
 
 exports.progress=async(userId,gymId,data)=>{
     console.log(gymId,data)
     const{weight,bodyFat,notes,photo}=data
-    return prisma.progressLog.create({
+    const result= prisma.progressLog.create({
         data:{
             userId,
             gymId,
@@ -18,6 +19,8 @@ exports.progress=async(userId,gymId,data)=>{
             photo:true
         }
     })
+    await redis.del(`progress:${userId}:${gymId}`);
+    return result;
 }
 
 exports.getProgress=async(userId,gymId)=>{
