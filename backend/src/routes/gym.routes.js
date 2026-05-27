@@ -100,7 +100,7 @@ router.get("/:gymId/insights",authMiddleware,gymMiddleware,roleMiddleware("OWNER
  * @description Gets all notifications for the authenticated user. Only authenticated users can access their notifications.
  * @access Private (Requires authentication)
  */
-router.get("/me", authMiddleware, notificationController.getNotifications);
+router.get("/notifications", authMiddleware, notificationController.getNotifications);
 
 /**
  * @route PATCH /api/gym/notifications/:notificationId/read - Mark a notification as read

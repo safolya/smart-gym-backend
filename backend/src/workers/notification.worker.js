@@ -1,26 +1,33 @@
-const { Worker, connection } = require("../config/bullmq");
 
+require("dotenv").config();
+
+const { Worker, connection } = require("../config/bullmq");
+const notificationService = require("../services/notification.service");
 const worker = new Worker(
     "notifications",
     async (job) => {
         if (job.name === "subscription-expiry-reminder") {
-            const { userId, gymId, subscriptionId } = job.data;
+            const { userId, gymId, title, message } = job.data;
 
-            console.log(
-                `Send reminder to user ${userId} for gym ${gymId}, subscription ${subscriptionId}`
-            );
+            await notificationService.createNotification({
+                userId,
+                gymId,
+                title,
+                message,
+                type:"SUBSCRIPTION"
+            })
 
             
-            return { ok: true };
+            return { success:true };
         }
     },
     { connection }
 );
 
 worker.on("completed", (job) => {
-    console.log(`Job completed: ${job.id}`);
+    console.log(` Notification Job completed: ${job.id}`);
 });
 
 worker.on("failed", (job, err) => {
-    console.error(`Job failed: ${job?.id}`, err.message);
+    console.error(`Notification Job failed: ${job?.id}`, err.message);
 });

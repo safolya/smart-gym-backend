@@ -4,7 +4,7 @@ exports.subscription=async(req,res)=>{
     try {
         const { gymId, planId } = req.params;
         const userId = req.user.id;
-
+        console.log(userId);
         const subscription = await subscriptionServices.subscription(userId, gymId, planId);
         res.status(201).json(subscription);
 
