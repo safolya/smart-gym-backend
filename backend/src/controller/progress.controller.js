@@ -5,7 +5,7 @@ exports.addProgress=async(req,res)=>{
         const userId=req.user.id;
         const {gymId}=req.params;
         console.log(gymId);
-        const data=await progressService.addProgress(userId,gymId,req.body);
+        const data=await progressService.addProgress(userId,gymId,req.body,req.file);
         res.status(200).json({
             message:"Succesfull",
             data

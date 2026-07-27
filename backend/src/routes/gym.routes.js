@@ -5,6 +5,7 @@ const gymMiddleware = require("../middleware/gym.middleware");
 const roleMiddleware=require("../middleware/role.middleware")
 const planController=require("../controller/plan.Controller")
 const subscriptionController=require("../controller/subscription.Controller")
+const upload=require("../middleware/upload.middleware")
 const exerciseController=require("../controller/exercise.controller")
 const workoutController=require("../controller/workout.controller");
 const progressController=require("../controller/progress.controller")
@@ -69,7 +70,7 @@ router.get("/:gymId/workourts",authMiddleware,gymMiddleware,roleMiddleware("OWNE
  * @access Private (Requires authentication)
  */
 
-router.post("/:gymId/progress",authMiddleware,gymMiddleware,roleMiddleware("OWNER","TRAINER","MEMBER"),progressController.addProgress)
+router.post("/:gymId/progress",authMiddleware,gymMiddleware,upload.single("image"),roleMiddleware("OWNER","TRAINER","MEMBER"),progressController.addProgress)
 
 /**
  * @route GET /api/gym/:gymId/getProgress - Get progress for a user (Owner, Trainer, and Member)

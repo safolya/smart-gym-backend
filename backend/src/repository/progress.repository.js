@@ -4,16 +4,26 @@ const redis=require("../config/redis")
 exports.progress=async(userId,gymId,data)=>{
     console.log(gymId,data)
     const{weight,bodyFat,notes,photo}=data
-    const result= prisma.progressLog.create({
+    const result=await prisma.progressLog.create({
         data:{
             userId,
             gymId,
             weight,
             bodyFat,
             notes,
-            photo:{
-                create:photo?.map((url) => ({ url })) || [],
-            },
+            photo:
+            photo
+            ?
+            {
+                create:[
+                {
+                    url:photo.url,
+                    publicId:photo.publicId
+                }
+                ]
+            }
+            :
+            undefined
         },
         include:{
             photo:true

@@ -1,9 +1,36 @@
 const progressRepository = require("../repository/progress.repository")
-const redis = require("../config/redis")
+const redis = require("../config/redis");
+const uploadToCloudinary = require("../utils/uploadToCloudinary");
 
-exports.addProgress = async (userId, gymId, data) => {
+exports.addProgress = async (userId, gymId, data, file) => {
     console.log(gymId)
-    return await progressRepository.progress(userId, gymId, data);
+
+    const uploadPhoto = null;
+
+    if (file) {
+        uploadPhoto = await uploadToCloudinary(file.buffer, "smart-gym/progress");
+    }
+    const progress = await progressRepository.progress(
+        userId, gymId,
+        {
+            ...data,
+            photo: uploadPhoto ?
+                {
+                    url:
+                        uploadPhoto.secure_url,
+
+                    publicId:
+                        uploadPhoto.public_id
+                }
+                :
+                null
+
+        }
+    )
+    await redis.del(
+        `progress:${userId}:${gymId}`
+    );
+    return progress;
 }
 
 exports.getProgress = async (userId, gymId) => {
@@ -24,20 +51,20 @@ exports.getProgress = async (userId, gymId) => {
     console.log("Database hit");
 
     const data = await progressRepository.getProgress(
-    userId,
-    gymId
-  );
+        userId,
+        gymId
+    );
 
-  // 4. Save in Redis for 1 hour
-  await redis.set(
-    cacheKey,
-    JSON.stringify(data),
-    "EX",
-    3600
-  );
+    // 4. Save in Redis for 1 hour
+    await redis.set(
+        cacheKey,
+        JSON.stringify(data),
+        "EX",
+        3600
+    );
 
 
-  return data;
+    return data;
 
 }
 
